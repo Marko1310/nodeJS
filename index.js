@@ -42,7 +42,12 @@ const replaceTemplate = (temp, product) => {
   output = output.replace(/{%FROM%}/g, product.from);
   output = output.replace(/{%NUTRIENTS%}/g, product.nutrients);
   output = output.replace(/{%QUANTITY%}/g, product.quantity);
-  output = output.replace(/{%IMAGE%}/g, product.image);
+  output = output.replace(/{%DESCRIPTION%}/g, product.description);
+  output = output.replace(/{%ID%}/g, product.id);
+
+  if (!product.organic)
+    output = output.replace(/{%NOT_ORGANIC%}/g, "not-organic");
+  return output;
 };
 const tempOverview = fs.readFileSync(
   `${__dirname}/templates/template-overview.html`,
@@ -60,6 +65,7 @@ const tempProduct = fs.readFileSync(
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, `utf-8`);
 
 const dataObj = JSON.parse(data);
+console.log(dataObj);
 
 const server = http.createServer((req, res) => {
   const pathName = req.url;
@@ -69,10 +75,12 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, {
       "Content-type": "text/html",
     });
+    const cardsHtml = dataObj
+      .map((el) => replaceTemplate(tempCard, el))
+      .join("");
+    const output = tempOverview.replace(`{%PRODUCT_CARDS%}`, cardsHtml);
 
-    const cardsHtml = dataObj.map((el) => replaceTemplate(tempCard, el));
-
-    res.end(tempOverview);
+    res.end(output);
 
     // Product page
   } else if (pathName === "/product") {
