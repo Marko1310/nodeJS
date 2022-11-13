@@ -1,4 +1,8 @@
+const slugify = require("slugify");
+
 module.exports = (temp, product) => {
+  let slugifyName = slugify(product.productName, { lower: true });
+
   let output = temp.replace(/{%PRODUCTNAME%}/g, product.productName);
   output = output.replace(/{%IMAGE%}/g, product.image);
   output = output.replace(/{%PRICE%}/g, product.price);
@@ -6,7 +10,7 @@ module.exports = (temp, product) => {
   output = output.replace(/{%NUTRIENTS%}/g, product.nutrients);
   output = output.replace(/{%QUANTITY%}/g, product.quantity);
   output = output.replace(/{%DESCRIPTION%}/g, product.description);
-  output = output.replace(/{%ID%}/g, product.id);
+  output = output.replace(/{%SLUGIFY%}/g, slugifyName);
 
   if (!product.organic)
     output = output.replace(/{%NOT_ORGANIC%}/g, "not-organic");

@@ -4,6 +4,8 @@ const http = require("http");
 const path = require("path");
 const url = require("url");
 
+const slugify = require("slugify");
+
 const replaceTemplate = require("./modules/replaceTemplate");
 
 /////////////////////////////////////////
@@ -54,6 +56,11 @@ const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, `utf-8`);
 
 const dataObj = JSON.parse(data);
 
+const slug = dataObj.map((el) => slugify(el.productName, { lower: true }));
+console.log(slug);
+
+console.log(dataObj);
+
 const server = http.createServer((req, res) => {
   //   console.log(req.url);
   //   console.log(url.parse(req.url, true));
@@ -77,11 +84,14 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, {
       "Content-type": "text/html",
     });
-    const product = dataObj[query.id];
-    console.log(product);
 
-    const output = replaceTemplate(tempProduct, product);
-    res.end(output);
+    console.log(pathname);
+
+    // const product = dataObj[query.id];
+    // console.log(product);
+
+    // const output = replaceTemplate(tempProduct, product);
+    // res.end(output);
 
     // API
   } else if (pathname === "/api") {
