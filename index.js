@@ -56,15 +56,14 @@ const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, `utf-8`);
 
 const dataObj = JSON.parse(data);
 
+// slug product name to lower case
 const slug = dataObj.map((el) => slugify(el.productName, { lower: true }));
-console.log(slug);
-
-console.log(dataObj);
 
 const server = http.createServer((req, res) => {
-  //   console.log(req.url);
-  //   console.log(url.parse(req.url, true));
   const { query, pathname } = url.parse(req.url, true);
+
+  // find an element that has the same name as pathname
+  const productLink = slug.find((el) => el == pathname.slice(9));
 
   // Overview page
   if (pathname === "/" || pathname === "/overview") {
@@ -79,25 +78,32 @@ const server = http.createServer((req, res) => {
 
     res.end(output);
 
-    // Product page
-  } else if (pathname === "/product") {
+    //Product page
+  } else if (pathname.includes(productLink)) {
     res.writeHead(200, {
       "Content-type": "text/html",
     });
 
-    console.log(pathname);
+    // filter the array element that has the same name as pathaname
+    const filter = function (arr, query) {
+      return arr.filter(
+        (el) => slugify(el.productName, { lower: true }) === query
+      );
+    };
 
-    // const product = dataObj[query.id];
-    // console.log(product);
+    const product = filter(dataObj, productLink);
 
-    // const output = replaceTemplate(tempProduct, product);
-    // res.end(output);
+    // replace that template with filtered element information
+    const output = replaceTemplate(tempProduct, product[0]);
+    res.end(output);
 
     // API
   } else if (pathname === "/api") {
     res.writeHead(200, {
       "Content-type": "application/json",
     });
+    console.log(query);
+
     res.end(data);
 
     // Not found
